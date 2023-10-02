@@ -1,0 +1,129 @@
+package application;
+
+import javafx.application.Application;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
+
+public class tutorail extends Application {
+
+    private TextField display;
+    private String currentInput = "";
+    private String currentOperator = "";
+    private double result = 0.0;
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+
+    @Override
+    public void start(Stage primaryStage) {
+        primaryStage.setTitle("Advanced JavaFX Calculator");
+
+        // Create a text field for the display
+        display = new TextField();
+        display.setEditable(false);
+        display.setAlignment(Pos.CENTER);
+        display.setPrefHeight(50);
+
+        // Create a grid pane for buttons
+        GridPane gridPane = new GridPane();
+        gridPane.setAlignment(Pos.CENTER);
+        gridPane.setHgap(10);
+        gridPane.setVgap(10);
+
+        // Create buttons for digits and operators
+        String[][] buttonLabels = {
+            {"7", "8", "9", "/"},
+            {"4", "5", "6", "*"},
+            {"1", "2", "3", "-"},
+            {"0", ".", "=", "+"}
+        };
+
+        for (int row = 0; row < buttonLabels.length; row++) {
+            for (int col = 0; col < buttonLabels[row].length; col++) {
+                Button button = createButton(buttonLabels[row][col]);
+                gridPane.add(button, col, row);
+            }
+        }
+
+        // Handle button clicks
+        for (int row = 0; row < buttonLabels.length; row++) {
+            for (int col = 0; col < buttonLabels[row].length; col++) {
+                Button button = (Button) gridPane.getChildren().get(row * buttonLabels[row].length + col);
+                button.setOnAction(e -> handleButtonClick(button.getText()));
+            }
+        }
+
+        // Create the main layout
+        GridPane mainLayout = new GridPane();
+        mainLayout.setAlignment(Pos.CENTER);
+        mainLayout.add(display, 0, 0);
+        mainLayout.add(gridPane, 0, 1);
+
+        // Create the scene and set it on the stage
+        Scene scene = new Scene(mainLayout, 300, 400);
+        primaryStage.setScene(scene);
+
+        // Show the stage
+        primaryStage.show();
+    }
+
+    private Button createButton(String label) {
+        Button button = new Button(label);
+        button.setPrefSize(50, 50);
+        return button;
+    }
+
+    private void handleButtonClick(String buttonText) {
+        if (buttonText.matches("[0-9]|\\.")) {
+            currentInput += buttonText;
+            display.setText(currentInput);
+        } else if (buttonText.matches("[+\\-*/]")) {
+            if (!currentInput.isEmpty()) {
+                if (!currentOperator.isEmpty()) {
+                    calculateResult();
+                }
+                result = Double.parseDouble(currentInput);
+                currentInput = "";
+                currentOperator = buttonText;
+            }
+        } else if (buttonText.equals("=")) {
+            if (!currentOperator.isEmpty()) {
+                calculateResult();
+                currentOperator = "";
+            }
+        }
+    }
+
+    private void calculateResult() {
+        double input = Double.parseDouble(currentInput);
+        switch (currentOperator) {
+            case "+":
+                result += input;
+                break;
+            case "-":
+                result -= input;
+                break;
+            case "*":
+                result *= input;
+                break;
+            case "/":
+                if (input != 0) {
+                    result /= input;
+                } else {
+                    display.setText("Error");
+                    currentInput = "";
+                    currentOperator = "";
+                    result = 0.0;
+                    return;
+                }
+                break;
+        }
+        display.setText(String.valueOf(result));
+        currentInput = "";
+    }
+}

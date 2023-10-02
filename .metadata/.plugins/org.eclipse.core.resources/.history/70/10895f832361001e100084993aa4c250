@@ -1,0 +1,81 @@
+package application;
+
+import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.stage.Stage;
+
+public class tutorail extends Application {
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+
+    @Override
+    public void start(Stage primaryStage) {
+        primaryStage.setTitle("Student Management App");
+
+        // Create a VBox to hold the UI elements
+        VBox vbox = new VBox(10);
+        vbox.setAlignment(Pos.CENTER);
+        vbox.setPadding(new Insets(20));
+
+        // Create buttons for adding, deleting, and displaying students
+        Button addStudentButton = new Button("Add Student");
+        Button deleteStudentButton = new Button("Delete Student");
+        Button displayStudentButton = new Button("Display Students");
+
+        // Create a TextArea to display student information
+        TextArea studentTextArea = new TextArea();
+        studentTextArea.setEditable(false);
+
+        // Add event handlers to the buttons
+        addStudentButton.setOnAction(e -> {
+            // Implement code to add a student here
+            Student st = new Student();
+            st.setStudentName("John"); // Set student details here
+            st.setStudentPhone("1234567890");
+            st.setStudentCity("New York");
+
+            boolean added = StudentDao.insertStudnetToDB(st);
+            if (added) {
+                studentTextArea.appendText("Student added successfully\n");
+            } else {
+                studentTextArea.appendText("Error adding student\n");
+            }
+        });
+
+        deleteStudentButton.setOnAction(e -> {
+            // Implement code to delete a student here
+            int userId = 1; // Replace with the actual student ID to delete
+            boolean deleted = StudentDao.deleteStudent(userId);
+            if (deleted) {
+                studentTextArea.appendText("Student deleted successfully\n");
+            } else {
+                studentTextArea.appendText("Error deleting student\n");
+            }
+        });
+
+        displayStudentButton.setOnAction(e -> {
+            // Implement code to display students here
+            studentTextArea.clear(); // Clear previous data
+            boolean displayed = StudentDao.DisplayAll();
+            if (!displayed) {
+                studentTextArea.appendText("Error displaying students\n");
+            }
+        });
+
+        // Add UI elements to the VBox
+        vbox.getChildren().addAll(addStudentButton, deleteStudentButton, displayStudentButton, studentTextArea);
+
+        // Create the scene and set it on the stage
+        Scene scene = new Scene(vbox, 400, 300);
+        primaryStage.setScene(scene);
+
+        // Show the stage
+        primaryStage.show();
+    }
+}
